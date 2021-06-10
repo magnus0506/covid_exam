@@ -67,6 +67,8 @@ public class RestController {
 
     }
 
+
+
     @GetMapping("/kommuner")
     public List<Kommune> findAllKommuner(){
         return kommuneRepository.findAll();

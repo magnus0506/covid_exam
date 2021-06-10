@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+        integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+  <link rel="stylesheet" href="/style.css">
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+          integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+          crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns"
+          crossorigin="anonymous"></script>
+    <title>Kommuner</title>
+</head>
+<body style="font-family: 'Calibri Light',serif; background-color: #ebf4f0">
+
+<div class="container" style="background-color: #ebf4f0">
+
+  <div class="container">
+    <div>
+      <h1>Kommuner</h1>
+      <a href="/">
+        <input type="button" class="btn btn-primary" value="Sogne">
+      </a>
+      <br/><br/>
+
+      <table class="table table-striped table-bordered table-hover" id="tbl">
+        <thead class="thead-light" style="text-align: center">
+        <tr>
+          <th>Kommune Id</th>
+          <th>Kommune</th>
+          <th>Kommune kode</th>
+        </tr>
+        </thead>
+        <tbody style="text-align: center">
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="../javascript/kommuneliste.js"></script>
+</html>

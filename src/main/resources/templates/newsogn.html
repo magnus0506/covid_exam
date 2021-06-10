@@ -21,7 +21,9 @@
 
         <div class="col-md-10 col-sm">
             <h1>Opret nyt sogn</h1>
-            <a href="/">Sogne</a>
+            <a href="/">
+                <input type="button" class="btn btn-primary" value="Sogne">
+            </a>
             <br/><br/>
             <form>
                 <div class="mb-3">
@@ -49,85 +51,14 @@
                     <label for="dato" class="form-label">Påbegyndelsesdato af nedlukning</label><br>
                     <input type="date" min="2021-06-01" max="2099-01-01" id="dato"><br>
                 </div>
-                <button type="button" class="btn" id="add-event">Opret</button>
+                <button type="button" class="btn btn-primary" id="add-event">Opret</button>
             </form>
             <p id="err" style="color: red"></p>
         </div>
     </div>
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="../javascript/newsogn.js"></script>
 
-<script>
-    let sognString;
-
-    $(document).ready(function () {
-        $.ajax({
-            url: "http://localhost:8080/kommuner",
-            success: function (result) {
-                let options = "<option>";
-                $.each(result, function (key, val) {
-                    options += "<option>" + val['kommuneNavn']
-                });
-                sognString = $("#kommune");
-                $(sognString).html(options)
-            }
-        });
-    })
-
-    $(function nedlukningStatus() {
-        let options = "<option></option>" + "<option>Ikke nedlukket</option>" + "<option>Nedlukket</option>";
-        sognString = $("#status");
-        $(sognString).html(options)
-    })
-
-
-    $(function () {
-        $('#add-event').on('click', function () {
-            let dataString = {
-                sognKode: $('#sognekode').val(),
-                sognNavn: $('#sogn').val(),
-                sognKommune: {
-                    kommuneId: $("#kommune").get(0).selectedIndex
-                },
-                sognIncidens: $('#incidens').val(),
-                sognNedlukket: $('#status').get(0).selectedIndex - 1,
-                sognStartDato: $('#dato')
-            }
-
-
-            function maxCheck(x, y) {
-                if (x <= y) {
-                    return x + 1;
-                }
-            }
-
-
-            sognString = maxCheck(dataString.sognKommune.kommuneId - 1, $("#kommune option").length - 1)
-            console.log("kommune array: " + ($("#kommune option").length - 1))
-            console.log("kommune id: " + (dataString.sognKommune.kommuneId = sognString))
-
-
-            console.log(dataString);
-            $.ajax({
-                type: 'POST',
-                url: 'http://localhost:8080/postsogn',
-                dataType: 'json',
-                data: JSON.stringify(dataString),
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-type': 'application/json'
-                },
-                success: function (data) {
-                    alert('Sogn oprettet')
-                    console.log(data);
-                },
-                error: function () {
-                    $('#err').html("Oops, something went wrong!")
-                }
-            })
-        })
-    })
-
-</script>
 </body>
 </html>

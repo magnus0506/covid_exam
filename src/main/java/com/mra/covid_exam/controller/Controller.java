@@ -14,4 +14,10 @@ public class Controller {
     public String editSogn(){
         return "editsogn";
     }
+
+    @GetMapping("/kommuneliste")
+    public String kommuneListe(){
+        return "kommuneliste";
+    }
+
 }

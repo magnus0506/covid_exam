@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Ret sogn</title>
+
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+          integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+    <link rel="stylesheet" href="/style.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+            integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns"
+            crossorigin="anonymous"></script>
+
+</head>
+<body style="font-family: 'Calibri Light',serif; background-color: #ebf4f0">
+<div class="container">
+    <div class="row">
+
+        <div class="col-md-10 col-sm">
+            <h1>Ret sogn</h1>
+            <a href="/">Sogne</a>
+            <br/><br/>
+            <form>
+                <div class="mb-3">
+                    <label for="sognekode" class="form-label">Sognekode</label>
+                    <input class="form-control" id="sognekode">
+                </div>
+
+                <div class="mb-3">
+                    <label for="sogn" class="form-label">Sogn</label>
+                    <input class="form-control" id="sogn">
+                </div>
+                <div class="mb-3">
+                    <label for="kommune" class="form-label">Kommune</label>
+                    <select class="form-control" id="kommune"></select>
+                </div>
+                <div class="mb-3">
+                    <label for="incidens" class="form-label">Incidens</label>
+                    <input class="form-control" required id="incidens">
+                </div>
+                <div class="mb-3">
+                    <label for="status" class="form-label">Status af nedlukning</label>
+                    <select class="form-control" id="status"></select>
+                </div>
+                <div class="mb-3">
+                    <label for="dato" class="form-label">Påbegyndelsesdato af nedlukning</label><br>
+                    <input type="date" min="2021-06-01" max="2099-01-01" id="dato"><br>
+                </div>
+                <button type="button" class="btn" id="edit">Opdater</button>
+            </form>
+            <p id="err" style="color: red"></p>
+        </div>
+    </div>
+</div>
+</body>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    let sognString;
+    let pathArr = window.location.pathname.split("/");
+    console.log(pathArr)
+
+    $(document).ready(function () {
+        $.ajax({
+            url: "http://localhost:8080/kommuner",
+            success: function (result) {
+                let options = "<option>";
+                $.each(result, function (key, val) {
+                    options += "<option>" + val['kommuneNavn']
+                });
+                sognString = $("#kommune");
+                $(sognString).html(options)
+            }
+        })
+
+        $.ajax({
+            url: "http://localhost:8080/sogne/" + pathArr[1],
+            success: function (result) {
+                console.log(result)
+                let kode = result["sognKode"]
+                let sogn = result["sognNavn"]
+                let kommune = result["sognKommune"]["kommuneNavn"]
+                let incidens = result["sognIncidens"]
+                let status = result["sognNedlukket"]
+                console.log(status)
+                let text
+                if (status === false)
+                    text = 1
+
+                console.log(text)
+                let dato = result["sognStartdato"]
+                $(function (){
+                    $("#sognekode").val(kode);
+                    $("#sogn").val(sogn);
+                    $("#kommune").val(kommune);
+                    $("#incidens").val(incidens);
+                    $("#status").val(text);
+                    $("#dato").val(dato);
+                })
+            }
+        })
+
+
+
+
+        $(function nedlukningStatus() {
+            let options = "<option></option>" + "<option>Ikke nedlukket</option>" + "<option>Nedlukket</option>";
+            sognString = $("#status");
+            $(sognString).html(options)
+        })
+
+        $(function () {
+            $('#edit').on('click', function () {
+                let dataString = {
+                    sognKode: $('#sognekode').val(),
+                    sognNavn: $('#sogn').val(),
+                    sognKommune: {
+                        kommuneId: $("#kommune").get(0).selectedIndex
+                    },
+                    sognIncidens: $('#incidens').val(),
+                    sognNedlukket: $('#status').get(0).selectedIndex - 1,
+                    sognStartdato: $('#dato').val()
+                }
+
+
+                function maxCheck(x, y) {
+                    if (x <= y) {
+                        return x + 1;
+                    }
+                }
+
+                console.log(dataString)
+
+                sognString = maxCheck(dataString.sognKommune.kommuneId - 1, $("#kommune option").length - 1)
+                $.ajax({
+                    type: 'PATCH',
+                    url: 'http://localhost:8080/sogne/' + pathArr[1],
+                    dataType: 'json',
+                    data: JSON.stringify(dataString),
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-type': 'application/json'
+                    },
+                    success: function (data) {
+                        location.replace("http://localhost:8080/")
+                        console.log(data);
+                    },
+                    error: function () {
+                        $('#err').html("Oops, something went wrong!")
+                    }
+                })
+            })
+        })
+    })
+
+</script>
+</html>

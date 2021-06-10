@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <title>Sogne</title>
+    <link rel="icon" type="image/x-icon" href="../static/assets/favicon.ico"/>
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="styles.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-wEmeIV1mKuiNpC+IOBjI7aAzPcEZeedi5yW5f2yOq55WWLwNGmvvx4Um1vskeMj0" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
+
+
+</head>
+
+<body style="font-family: 'Calibri Light',serif; background-color: #ebf4f0">
+
+<div class="container" style="background-color: #ebf4f0">
+
+    <div class="container">
+        <div>
+            <h1>Sogne</h1>
+            <a href="/newsogn">Opret nyt sogn</a>
+            <br/><br/>
+
+            <table class="table table-striped table-bordered table-hover" id="tbl">
+                <thead class="thead-light" style="text-align: center">
+                <tr>
+                    <th>Sognekode</th>
+                    <th>Sogn</th>
+                    <th>Kommunekode</th>
+                    <th>Kommune</th>
+                    <th>Incidens</th>
+                    <th>Status af nedlukning</th>
+                    <th>Påbegyndelsesdato af nedlukning</th>
+                </tr>
+                </thead>
+                <tbody style="text-align: center">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+<!-- Bootstrap core JS-->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-p34f1UUtsS3wqzfto5wAAmdvj+osOnFyQFpp4Ua3gs/ZVWx6oOypYoCJhGGScy+8"
+        crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+
+    function checkDate(x,y,z){
+        if (x < 10){
+            return "0" + (x + z)
+        }
+        return x
+    }
+
+    function nedlukketCheck(x){
+        if(x === true){
+            return "Nedlukket";
+        }
+        return "Ikke nedlukket";
+    }
+    $(document).ready(function () {
+        $.ajax({
+            url: "http://localhost:8080/sogne",
+            success: function (result) {
+                console.log(result);
+                let tableContent = "";
+                $.each(result, function (key, value) {
+
+                    let date = new Date(value["sognStartdato"])
+                    date.toJSON();
+
+                    let dateCheck = checkDate(date.getDate(), 10, 0)
+                    let monthCheck = checkDate(date.getMonth(), 10, 1)
+                    let nedlukketDate =  dateCheck + "-" + monthCheck + "-" + date.getFullYear()
+
+
+                    let nedlukket = nedlukketCheck(value["sognNedlukket"])
+
+                    let nedlukningStatus = function () {
+                        if (nedlukket === "Nedlukket"){
+
+                            return nedlukketDate
+                        } else
+                        return nedlukketDate = " "
+                    }
+
+                    console.log(nedlukket)
+                    console.log(dateCheck)
+                    tableContent += "<tr>";
+                    tableContent +=
+                        "<td>" + value["sognKode"] +
+                        "</td><td>" + value["sognNavn"] +
+                        "</td><td>" + value["sognKommune"]["kommuneKode"] + "</td>" +
+                        "</td><td>" + value["sognKommune"]["kommuneNavn"] + "</td>" +
+                        "</td><td>" + value["sognIncidens"] + "</td>" +
+                        "</td><td>" + nedlukket + "</td>" +
+                        "<td>" + nedlukningStatus() +
+                        "</td><td>" +
+                        "<input  type='image' src='/images/edit.png' style='width:20px' alt='Edit' id='img' " +
+                        "class='editbtn' data-id='" + value["sognId"] + "'>" +
+                        "</td><td>" +
+                        "<input type='image' src='/images/delete.png' style='width:20px' alt='Delete' id='img' " +
+                        "class='deletebtn' data-id='" + value["sognId"] + "'></td>";
+
+                });
+                tableContent += "</tr>";
+
+                $('#tbl tbody').html(tableContent)
+            }
+        });
+        $(document).on('click', ".editbtn", function (e) {
+            e.preventDefault();
+            const id = $(this).data('id');
+            console.log(id)
+            window.location.replace("http://localhost:8080/" + id);
+        });
+
+    });
+</script>
+</html>
